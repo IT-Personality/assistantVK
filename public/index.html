@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<!-- Подключение Bootstrap чтобы все выглядело красиво -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+	<title>Помощник для VK</title>
+	<!-- Свои стили -->
+	<link rel="stylesheet"  href="public/styles/css/styl.css" type="text/css" />
+</head>
+<style>
+.clip img {
+    height: 51vh;
+    object-fit: cover;
+    width: 30vh;
+}
+body { font-family: Arial, sans-serif; margin: 20px; }
+.clip {
+    margin: 14px;
+}
+    .clip a { text-decoration: none; color: black; }
+    .clip a:hover { text-decoration: underline; }
+    .views { margin-top: 5px; font-size: 14px; color: gray; }
+    .container-clips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+</style>
+<body>
+    <h1>Запуск скрипта для получения клипов</h1>
+    <form id="fetchForm">
+        <label for="communityUrl">Введите URL сообщества:</label>
+        <input type="text" id="communityUrl" name="communityUrl" placeholder="https://vk.com/clips/mensmot" required>
+        <button type="submit">Получить клипы</button>
+    </form>
+    <div id="clipsContainer"></div>
+
+    <script>
+        document.getElementById('fetchForm').addEventListener('submit', async (event) => {
+            event.preventDefault(); // Предотвращаем стандартное поведение формы
+
+            const communityUrl = document.getElementById('communityUrl').value;
+            const clipsContainer = document.getElementById('clipsContainer');
+            clipsContainer.innerHTML = 'Запрос отправляется...';
+
+            try {
+                const response = await fetch('/fetch-clips?url=' + encodeURIComponent(communityUrl));
+                const result = await response.text();
+                clipsContainer.innerHTML = result;
+            } catch (error) {
+                clipsContainer.textContent = 'Ошибка при запросе.';
+            }
+        });
+    </script>
+</body>
+<!-- Подключаем jQuery, а также Socket.io -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"
+	integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw=="
+	crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+</script>
+</html>

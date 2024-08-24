@@ -1,0 +1,245 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+::-webkit-scrollbar {
+width: 5px;           
+}
+::-webkit-scrollbar-track {
+background: rgba(0, 0, 0, 0);      
+}
+::-webkit-scrollbar-thumb {
+background-color: rgb(68, 68, 68);  
+border-radius: 20px;       
+}
+::-webkit-input-placeholder {
+	color:    rgb(51, 51, 51) !important;
+}
+
+:root {
+    --gradient1: #141e30;
+    --gradient2: #243b55;
+    --second: #01858b;
+    --white: #fff;
+    --dark: #2b2b2b;
+    --gray: #3c3f41;
+    --light-gray: #6f7172;
+
+}
+
+
+.default-input {
+    position: relative;
+    .input {
+        width: 100%;
+        padding: 10px 0;
+        font-size: 16px;
+        color: var(--white);
+        margin-bottom: 30px;
+        border: none;
+        border-bottom: 1px solid var(--white);
+        outline: none;
+        background: transparent;
+        &:focus ~ .label,
+        &:valid ~ .label {
+            top: -20px;
+            left: 0;
+            color: var(--second);
+            font-size: 12px;
+        }
+    }
+    .label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 10px 0;
+        font-size: 16px;
+        color: var(--white);
+        pointer-events: none;
+        transition: 0.5s;
+    }
+}
+
+.default-submit {
+    width: 100%;
+    align-items: center;
+    background: transparent;
+    position: relative;
+    display: block;
+    padding: 10px 20px;
+    color: var(--second);
+    font-size: 16px;
+    text-decoration: none;
+    text-transform: uppercase;
+    overflow: hidden;
+    transition: 0.5s;
+    margin-bottom: 30px;
+    letter-spacing: 4px;
+    text-align: center;
+    cursor: pointer;
+    border-width: 0px;
+    &:hover {
+        background: var(--second);
+        color: #fff;
+        border-radius: 5px;
+        box-shadow:
+            0 0 5px var(--second),
+            0 0 25px var(--second),
+            0 0 50px var(--second);
+        outline: none;
+        opacity: 0.8;
+    }
+}
+
+.authorization,
+.registration {
+    overflow: hidden;
+    height: 100vh;
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-family: sans-serif;
+    background: linear-gradient(var(--gradient1), var(--gradient2));
+    .content-wrapper {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        max-width: 400px;
+        width: 100%;
+        padding: 40px;
+        padding-bottom: 10px;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.5);
+        box-sizing: border-box;
+        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
+        border-radius: 10px;
+        .title {
+            text-align: center;
+            color: var(--white);
+            margin-bottom: 40px;
+        }
+        .invite-block {
+            text-align: center;
+            color: var(--white);
+            font-size: 14px;
+            .register-link {
+                background: transparent;
+                border: 0;
+                color: var(--second);
+                font-size: 16px;
+                transition: all 0.2s ease-in-out;
+                padding: 0;
+                padding-bottom: 2px;
+                border-bottom: solid 1px transparent;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                &:hover {
+                    cursor: pointer;
+                    border-bottom: solid 1px var(--second);
+                }
+                &:active {
+                    outline: none;
+                }
+                &:focus {
+                    outline: none;
+                }
+            }
+        }
+    }
+}
+
+.chat-page {
+    overflow: hidden;
+    height: 100vh;
+    width: 100%;
+    font-family: sans-serif;
+    background: linear-gradient(var(--gradient1), var(--gradient2));
+    .site-main {
+        .chat {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            .container {
+                max-width: 1200px;
+                width: 100%;
+                margin: 0 auto;
+                .head {
+                    margin: 30px 0;
+                    display: flex;
+                    justify-content: space-between;
+                    color: var(--white);
+                    align-items: center;
+                }
+                .main {
+                    background: rgba(0, 0, 0, 0.5);
+                    box-sizing: border-box;
+                    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
+                    border-radius: 10px;
+                    padding: 20px;
+                    .scroll_block {
+                        position: relative;
+                        color: var(--white);
+                        height: 65vh;
+                        overflow-y: auto;
+                        margin-bottom: 20px;
+                        .scroll-down {
+                            cursor: pointer;
+                            position: sticky;
+                            width: 20px;
+                            height: 20px;
+                            padding: 10px;
+                            padding-top: 12px;
+                            padding-bottom: 8px;
+                            border-radius: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            bottom: 5%;
+                            left: 95%;
+                            display: flex;
+                            justify-content: end;
+                            background: var(--dark);
+                        }
+                    }
+                    .user-input {
+                        display: flex;
+                        align-items: end;
+                        gap: 6px;
+                        .message-form {
+                            margin-right: 10px;
+                            width: 100%;
+                            .input {
+                                margin-bottom: 0;
+                            }
+                        }
+                        .emoji {
+                            max-height: 35px;
+                            height: 100%;
+                            display: flex;
+                            align-items: end;
+                            .image {
+                                height: 35px;
+                                width: 35px;
+                                object-fit: cover;
+                            }
+                        }
+                        .submit {
+                            max-width: 60px;
+                            width: 100%;
+                            background: transparent;
+                            border: none;
+                            outline: none;
+                            max-height: 35px;
+                            height: 100%;
+                            cursor: pointer;
+                            transition: all .4s ease;
+                            &:hover {
+                                filter: brightness(0) invert(1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
