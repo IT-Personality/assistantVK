@@ -8,7 +8,7 @@ const port = 3000;
 app.use(express.static('public')); // Для обслуживания статических файлов
 
 app.get('/fetch-clips', async (req, res) => {
-    const url = req.query.url; // Получение URL из параметра запроса
+    const url = req.query.url;
 
     if (!url) {
         return res.status(400).send('Не указан URL сообщества.');
@@ -17,9 +17,8 @@ app.get('/fetch-clips', async (req, res) => {
     let browser;
     let page;
     try {
-        browser = await puppeteer.launch({ 
+        browser = await puppeteer.launch({
             headless: true,
-            executablePath: '/opt/render/.cache/puppeteer/chrome-linux/chrome', // Указание пути к Chrome
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
@@ -27,7 +26,7 @@ app.get('/fetch-clips', async (req, res) => {
                 '--disable-accelerated-2d-canvas',
                 '--disable-gpu',
                 '--no-zygote',
-                '--single-process', // Необходим для некоторых хостингов
+                '--single-process',
                 '--disable-gl-drawing-for-tests',
                 '--disable-background-timer-throttling',
                 '--disable-backgrounding-occluded-windows',
@@ -77,10 +76,9 @@ app.get('/fetch-clips', async (req, res) => {
         const clips = [];
 
         $('a.ShortVideoGridItem').each((index, element) => {
-            // Изменение ссылки на клип
             let relativeVideoUrl = $(element).attr('href');
             if (relativeVideoUrl.startsWith('/')) {
-                relativeVideoUrl = relativeVideoUrl.substring(1); // Удаление начального "/"
+                relativeVideoUrl = relativeVideoUrl.substring(1);
             }
             const videoUrl = `${url}?z=${relativeVideoUrl}`;
             const thumbStyle = $(element).find('div.ShortVideoGridItem__thumb').attr('style');
@@ -93,17 +91,16 @@ app.get('/fetch-clips', async (req, res) => {
 
         clips.sort((a, b) => b.views - a.views);
 
-        // Генерация HTML-ответа
         res.send(generateHTML(clips));
     } catch (error) {
         console.error('Ошибка при получении клипов:', error);
         res.status(500).send('Ошибка при получении клипов');
     } finally {
         if (page) {
-            await page.close(); // Закрытие страницы после завершения работы
+            await page.close();
         }
         if (browser) {
-            await browser.close(); // Закрытие браузера после завершения работы
+            await browser.close();
         }
     }
 });
