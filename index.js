@@ -5,7 +5,10 @@ const cheerio = require('cheerio');
 const app = express();
 const port = 3000;
 
-app.use(express.static('public')); // Для обслуживания статических файлов
+// Укажите путь к скачанному Chromium
+const chromiumPath = '/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.119/chrome-linux64/chrome';
+
+app.use(express.static('public'));
 
 app.get('/fetch-clips', async (req, res) => {
     const url = req.query.url;
@@ -19,6 +22,7 @@ app.get('/fetch-clips', async (req, res) => {
     try {
         browser = await puppeteer.launch({
             headless: true,
+            executablePath: chromiumPath,  // Указываем путь к Chromium
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
