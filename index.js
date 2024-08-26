@@ -22,12 +22,21 @@ app.get('/fetch-clips', async (req, res) => {
         browser = await puppeteer.launch({
             headless: true,
             executablePath: chromiumPath,
-            args: [
-                '--disable-setuid-sandbox', 
-                '--no-sandbox', 
+             args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
                 '--disable-dev-shm-usage',
                 '--single-process',
-                '--no-zygote'
+                '--no-zygote',
+                '--disable-background-networking',
+                '--disable-background-timer-throttling',
+                '--disable-backgrounding-occluded-windows',
+                '--disable-renderer-backgrounding',
+                '--disable-extensions',
+                '--disable-infobars',
+                '--disable-gpu',
+                '--disable-software-rasterizer',
+                '--mute-audio'
             ]
         });
 
