@@ -28,15 +28,6 @@ app.get('/fetch-clips', async (req, res) => {
                 '--disable-dev-shm-usage',
                 '--single-process',
                 '--no-zygote',
-                '--disable-background-networking',
-                '--disable-background-timer-throttling',
-                '--disable-backgrounding-occluded-windows',
-                '--disable-renderer-backgrounding',
-                '--disable-extensions',
-                '--disable-infobars',
-                '--disable-gpu',
-                '--disable-software-rasterizer',
-                '--mute-audio'
             ]
         });
 
