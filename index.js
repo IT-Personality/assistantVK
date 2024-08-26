@@ -1,9 +1,9 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 
 (async () => {
   try {
     const browser = await puppeteer.launch({
-      executablePath: '/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.119/chrome-linux64/chrome'
+      executablePath: '/opt/render/project/src/chrome/linux-128.0.6613.84/chrome-linux64/chrome' // Используйте найденный путь
     });
     const page = await browser.newPage();
     await page.goto('https://www.google.com');
@@ -13,4 +13,3 @@ const puppeteer = require('puppeteer');
     console.error('Error:', error);
   }
 })();
-
