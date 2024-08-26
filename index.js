@@ -1,5 +1,5 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
+
 const cheerio = require('cheerio');
 
 const app = express();
