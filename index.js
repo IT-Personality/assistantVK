@@ -1,5 +1,4 @@
 const express = require('express');
-
 const cheerio = require('cheerio');
 
 const app = express();
@@ -8,7 +7,6 @@ app.use(express.static('public')); // Для обслуживания стати
 
 const puppeteer = require('puppeteer-core'); 
 const chromiumPath = '/opt/render/project/src/chrome/linux-128.0.6613.84/chrome-linux64/chrome';
-
 app.get('/fetch-clips', async (req, res) => {
     const url = req.query.url;
 
@@ -22,18 +20,17 @@ app.get('/fetch-clips', async (req, res) => {
         browser = await puppeteer.launch({
             headless: true,
             executablePath: chromiumPath,
-             args: [
-                '--no-sandbox',
+            args: [
                 '--disable-setuid-sandbox',
+                '--no-sandbox',
                 '--disable-dev-shm-usage',
                 '--single-process',
-                '--no-zygote',
+                '--no-zygote'
             ]
         });
 
         page = await browser.newPage();
 
-        // Отключение загрузки изображений и других ненужных ресурсов
         await page.setRequestInterception(true);
         page.on('request', (request) => {
             if (['image', 'stylesheet', 'font', 'media'].includes(request.resourceType())) {
@@ -50,10 +47,9 @@ app.get('/fetch-clips', async (req, res) => {
             previousHeight = await page.evaluate('document.body.scrollHeight');
             await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
 
-            // Использование setTimeout для добавления паузы
             await new Promise(resolve => setTimeout(resolve, 500)); // Начальная задержка для загрузки контента
             const newHeight = await page.evaluate('document.body.scrollHeight');
-            
+
             if (newHeight === previousHeight) {
                 await new Promise(resolve => setTimeout(resolve, 1000)); // Дополнительная задержка для загрузки контента
                 const finalHeight = await page.evaluate('document.body.scrollHeight');
@@ -88,10 +84,10 @@ app.get('/fetch-clips', async (req, res) => {
         res.status(500).send('Ошибка при получении клипов');
     } finally {
         if (page) {
-            await page.close(); // Закрытие страницы после завершения работы
+            await page.close();
         }
         if (browser) {
-            await browser.close(); // Закрытие браузера после завершения работы
+            await browser.close();
         }
     }
 });
@@ -133,7 +129,6 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Сервер запущен на http://localhost:${port}`);
 });
-
 
 
 // const puppeteer = require('puppeteer-core'); 
