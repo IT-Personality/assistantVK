@@ -26,7 +26,7 @@ app.get('/fetch-clips', async (req, res) => {
             executablePath: chromiumPath // Указываем путь к Chromium
         });
         page = await browser.newPage();
-        await page.goto(url, { waitUntil: 'networkidle2' });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
         let previousHeight;
         while (true) {
