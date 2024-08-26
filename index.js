@@ -32,7 +32,7 @@ app.get('/fetch-clips', async (req, res) => {
         while (true) {
             previousHeight = await page.evaluate('document.body.scrollHeight');
             await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
-            await new Promise(resolve => setTimeout(resolve, 200));
+            await new Promise(resolve => setTimeout(resolve, 500));
             const newHeight = await page.evaluate('document.body.scrollHeight');
             if (newHeight === previousHeight) break;
         }
