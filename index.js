@@ -1,5 +1,4 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const Mutex = require('async-mutex').Mutex;
 
@@ -9,11 +8,14 @@ app.use(express.static('public'));
 
 const mutex = new Mutex();
 
+const puppeteer = require('puppeteer-core'); 
+const chromiumPath = '/opt/render/project/src/chrome/linux-128.0.6613.84/chrome-linux64/chrome';
 let browser;
 async function startBrowser() {
     try {
         browser = await puppeteer.launch({
             headless: true,
+            executablePath: chromiumPath,
             args: [
                 '--disable-setuid-sandbox',
                 '--no-sandbox',
