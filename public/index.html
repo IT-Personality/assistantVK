@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<title>Помощник для VK</title>
+    <link rel="icon" type="image/png" href="img/favicon.svg"/>
+	<link rel="stylesheet" href="/styles/css/styles.css" type="text/css" />
+</head>
+<style>
+.clip img {
+    height: 51vh;
+    object-fit: cover;
+    width: 30vh;
+}
+body { font-family: Arial, sans-serif; margin: 20px; }
+.clip {
+    margin: 14px;
+}
+    .clip a { text-decoration: none; color: black; }
+    .clip a:hover { text-decoration: underline; }
+    .views { margin-top: 5px; font-size: 14px; color: gray; }
+    .container-clips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+</style>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">AssistantVK</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-item nav-link active" href="#">Главная <span class="sr-only">(current)</span></a>
+            <a class="nav-item nav-link active" href="https://it-klondike.eu.org/it-personality/" target="_blank">Разработчик</a>
+            <a class="nav-item nav-link active" href="#" onclick="alert('В процессе разработки');">Скачать видео</a>
+          </div>
+        </div>
+      </nav>
+      <main>
+        
+        <h1 class="clips-h1">Сортировка клипов</h1>
+        <form id="fetchForm">
+            <label for="communityUrl">Введите URL сообщества</label>
+            <input type="text" id="communityUrl" name="communityUrl" placeholder="https://vk.com/clips/mensmot">
+            <div class="check_block">
+            <input type="checkbox" id="chkTest" />
+            <label for="chkTest" id="text-cort">Сортировка по дате</label>
+            </div>
+            <div class="date-cont" id="pnlTest">
+                <label for="startDate" class="from_to">От:</label>
+                <input type="date" id="startDate" name="startDate">
+        
+                <label for="endDate" class="from_to">До:</label>
+                <input type="date" id="endDate" name="endDate" onclick="this.showPicker()">
+            </div>
+            <button class="submit-clips" type="submit">Получить клипы</button>
+        </form>
+        
+    </main>
+    <div id="clipsContainer"></div>
+    
+    <script>
+        function setMaxDate() {
+            const today = new Date().toISOString().split('T')[0]; // Получаем текущую дату в формате yyyy-mm-dd
+            document.getElementById('startDate').setAttribute('max', today);
+            document.getElementById('endDate').setAttribute('max', today);
+        }
+    
+        // Устанавливаем максимальные даты при загрузке страницы
+        window.onload = setMaxDate;
+    
+        document.getElementById('fetchForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const communityUrl = document.getElementById('communityUrl').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const isDateSortingEnabled = document.getElementById('chkTest').checked; // Проверяем состояние чекбокса
+
+    let fetchUrl = `/fetch-clips?url=${encodeURIComponent(communityUrl)}`;
+
+    // Если сортировка по дате включена, добавляем параметры дат
+    if (isDateSortingEnabled) {
+        if (!startDate || !endDate) {
+            showErrorMessage('Пожалуйста, выберите обе даты.');
+            return;
+        }
+        if (startDate === endDate) {
+            showErrorMessage('Дата окончания не может быть такой же, как дата начала.');
+            return;
+        }
+        if (new Date(startDate) > new Date(endDate)) {
+            showErrorMessage('Дата окончания не может быть раньше даты начала.');
+            return;
+        }
+        fetchUrl += `&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+    }
+
+    const clipsContainer = document.getElementById('clipsContainer');
+    clipsContainer.innerHTML = 
+        `<div class="text-center">
+            <p>Загрузка... Время ожидания: 1-2 минуты</p>
+        </div>`;
+
+    try {
+        const response = await fetch(fetchUrl);
+        const result = await response.text();
+        clipsContainer.innerHTML = result;
+    } catch (error) {
+        showErrorMessage('Ошибка при запросе.');
+    }
+});
+
+function toggle() {
+    var div = document.getElementById('pnlTest');
+    var text = document.getElementById('text-cort');
+    if (this.checked) {
+        text.style.color = '#000000';
+        div.style.display = 'flex';
+    } else {
+        div.style.display = 'none';
+        text.style.color = '#5f5f5f';
+        document.getElementById('startDate').value = ''; // сброс значения даты
+        document.getElementById('endDate').value = ''; // сброс значения даты
+    }
+}
+
+    
+        function showErrorMessage(message) {
+            const clipsContainer = document.getElementById('clipsContainer');
+            clipsContainer.innerHTML = `
+            <div class="text-center">
+                <p>${message}</p>
+            </div>`;
+        }
+    
+        document.getElementById('chkTest').onchange = toggle;
+        document.getElementById('startDate').addEventListener('focus', function() {
+            this.showPicker();
+        });
+        document.getElementById('endDate').addEventListener('focus', function() {
+            this.showPicker();
+        });
+    </script>
+    
+    
+</body>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script>
+</script>
+</html>
