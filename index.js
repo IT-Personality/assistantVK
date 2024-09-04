@@ -5,11 +5,11 @@ const app = express();
 const port = 3000;
 app.use(express.static('public'));
 
-// Параметры для API-запросов
+
 const VK_GROUP_API_URL = 'https://api.vk.com/method/groups.getById';
 const VK_API_URL = 'https://api.vk.com/method/shortVideo.getOwnerVideos';
 const API_VERSION = '5.131';
-const ACCESS_TOKEN = 'ВАШ ТОКЕН ВК';
+const ACCESS_TOKEN = 'ВАШ ВК ТОКЕН';
 
 async function getOwnerIdAndNameFromGroupName(groupName) {
   try {
@@ -24,8 +24,8 @@ async function getOwnerIdAndNameFromGroupName(groupName) {
     if (response.data.response && response.data.response[0]) {
       const group = response.data.response[0];
       return {
-        id: -group.id,
-        name: group.name
+        id: -group.id, // ID сообщества 
+        name: group.name // Имя сообщества
       };
     } else {
       throw new Error('Не удалось получить данные группы');
@@ -69,14 +69,13 @@ function sortClipsByViews(clips) {
 }
 
 function isValidVkClipUrl(url) {
-  const regex = /^https:\/\/vk\.com\/clips\/[\w-]+$/;
+  const regex = /^https:\/\/vk\.com\/clips\/[\w.-]+$/;
   return regex.test(url);
 }
 
-// Функция для выбора обложки высокого разрешения
 function getHighResolutionThumbnail(images) {
   if (!Array.isArray(images) || images.length === 0) {
-    return 'https://via.placeholder.com/1080x1920?text=No+Image'; // Заглушка, если изображений нет
+    return 'https://via.placeholder.com/1080x1920?text=No+Image';
   }
 
   const highResImage = images.reduce((prev, current) => {
@@ -104,7 +103,7 @@ function generateHTML(clips, communityName, ownerId, baseClipUrl) {
       ${clips
         .map((clip) => {
           const thumbnailUrl = getHighResolutionThumbnail(clip.image || clip.first_frame || []);
-          const clipUrl = getClipUrl(clip, ownerId, baseClipUrl); // Передаем baseClipUrl для формирования URL
+          const clipUrl = getClipUrl(clip, ownerId, baseClipUrl);
           return `
             <div class="clip">
               <a href="${clipUrl}" target="_blank">
@@ -122,44 +121,33 @@ function generateHTML(clips, communityName, ownerId, baseClipUrl) {
 function formatNumber(number) {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 }
-
 app.get('/fetch-clips', async (req, res) => {
   const { url, startDate, endDate } = req.query;
 
   if (!url) {
-    return res.status(400).send('<div class="text-center"><p>URL не предоставлен</p></div>');
+      return res.status(400).send('<div class="text-center"><p>URL не предоставлен</p></div>');
   }
   if (!isValidVkClipUrl(url)) {
-    return res.status(400).send('<div class="text-center"><p>Ссылка некорректна</p></div>');
+      return res.status(400).send('<div class="text-center"><p>Ссылка некорректна</p></div>');
   }
 
   try {
-    allClips = [];
+      allClips = [];
 
-    const groupName = url.match(/vk\.com\/clips\/([^\/]+)/)[1];
-    const { id: ownerId, name: communityName } = await getOwnerIdAndNameFromGroupName(groupName);
+      const groupName = url.match(/vk\.com\/clips\/([^\/]+)/)[1];
+      const { id: ownerId, name: communityName } = await getOwnerIdAndNameFromGroupName(groupName);
+      let fetchedClips = await fetchClips(ownerId, startDate, endDate);
+      const sortedClips = sortClipsByViews(fetchedClips);
+      const baseClipUrl = url.split('/clips/')[1];
 
-    allClips = await fetchClips(ownerId);
-
-    let filteredClips = allClips;
-
-    // Фильтруем клипы только если даты предоставлены и чекбокс включен
-    if (startDate && endDate) {
-      filteredClips = filterClipsByDate(allClips, startDate, endDate);
-    }
-
-    const sortedClips = sortClipsByViews(filteredClips);
-
-    const baseClipUrl = url.split('/clips/')[1];
-
-    res.send(generateHTML(sortedClips, communityName, ownerId, baseClipUrl));
+      res.send(generateHTML(sortedClips, communityName, ownerId, baseClipUrl));
   } catch (error) {
-    console.error('Ошибка при обработке запроса:', error.message);
-    res.status(500).send(
-      `<div class="text-center">
-        <p>Ошибка при обработке запроса</p>
-      </div>`
-    );
+      console.error('Ошибка при обработке запроса:', error.message);
+      res.status(500).send(
+          `<div class="text-center">
+              <p>Ошибка при обработке запроса</p>
+          </div>`
+      );
   }
 });
 
@@ -173,31 +161,45 @@ function filterClipsByDate(clips, startDate, endDate) {
   });
 }
 
-  // Измененная функция fetchClips
-  async function fetchClips(ownerId, startFrom = null) {
-    try {
-      const queryParams = { ...params, owner_id: ownerId, start_from: startFrom };
-      const response = await axios.get(VK_API_URL, { params: queryParams });
   
-      if (response.data.response) {
-        const clips = response.data.response.items;
-  
-        // Рекурсивный вызов для получения всех клипов
-        if (response.data.response.next_from) {
-          const nextClips = await fetchClips(ownerId, response.data.response.next_from);
-          return [...clips, ...nextClips]; // Объединение текущих и следующих клипов
-        }
-  
-        return clips;
-      } else {
-        console.error('Ошибка получения данных:', response.data.error || 'Неизвестная ошибка');
-        return [];
+async function fetchClips(ownerId, startDate = null, endDate = null, startFrom = null) {
+  const clips = [];
+  const start = startDate ? new Date(startDate).getTime() : null;
+  const end = endDate ? new Date(endDate).getTime() : null;
+
+  while (true) {
+      try {
+          const queryParams = { ...params, owner_id: ownerId, start_from: startFrom };
+          const response = await axios.get(VK_API_URL, { params: queryParams });
+
+          if (response.data.response) {
+              const fetchedClips = response.data.response.items;
+
+              if (!fetchedClips.length) break;
+
+              for (const clip of fetchedClips) {
+                  const clipDate = new Date(clip.date * 1000).getTime();
+
+                  if ((!start || !end) || (clipDate >= start && clipDate <= end)) {
+                      clips.push(clip);
+                  } else if (start && clipDate < start) {
+                      return clips;
+                  }
+              }
+
+              startFrom = response.data.response.next_from;
+              if (!startFrom) break; 
+          } else {
+              console.error('Ошибка получения данных:', response.data.error || 'Неизвестная ошибка');
+              break;
+          }
+      } catch (error) {
+          console.error('Ошибка запроса:', error.message);
+          break;
       }
-    } catch (error) {
-      console.error('Ошибка запроса:', error.message);
-      return [];
-    }
   }
+  return clips;
+}
   
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
